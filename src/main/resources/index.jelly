@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+    A Jenkins plugin for limiting the number of queue entries for a given job.
+</div>
