@@ -1,16 +1,12 @@
 package org.jenkinsci.plugins.queuedjoblimit;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import hudson.Extension;
 import hudson.model.Action;
 import hudson.model.Job;
-import hudson.model.JobProperty;
 import hudson.model.Queue;
-import hudson.model.Queue.QueueDecisionHandler;
-import hudson.model.Queue.Task;
 
 @Extension
 public class QueuedJobLimitDecisionHandler extends Queue.QueueDecisionHandler {
@@ -24,7 +20,7 @@ public class QueuedJobLimitDecisionHandler extends Queue.QueueDecisionHandler {
 		
 		Job<?, ?> queuedJob = (Job<?,?>) p;
 		
-		QueuedJobLimitJobProperty<?> prop = queuedJob.getProperty(QueuedJobLimitJobProperty.class);
+		QueuedJobLimitProperty prop = queuedJob.getProperty(QueuedJobLimitProperty.class);
 		if (prop == null) {
 			return true;
 		}
@@ -55,12 +51,14 @@ public class QueuedJobLimitDecisionHandler extends Queue.QueueDecisionHandler {
 		
 		// If we haven't yet hit the limit of queued items, allow this request.
 		if (matches < maxNum) {
-			LOGGER.info("Blocking the queue request from " +
-				jobName + " due to already having " + matches + " queued instances. (" + matches + " >= " + maxNum + " max).");
+			LOGGER.fine("Allowing queue request from " +
+					jobName + " because there are only " + matches + " queued instances. (" + matches + " < " + maxNum + " max).");
 			return true;
 		}
 		
 		// It looks like we've hit our limit!
+		LOGGER.info("Blocking the queue request from " +
+				jobName + " due to already having " + matches + " queued instances. (" + matches + " >= " + maxNum + " max).");
 		return false;
 	}
 }
